@@ -23,3 +23,6 @@ erl_crash.dump
 elixir_rabbit-*.tar
 
 /config/prod.exs
+output_*
+output.txt
+log/
