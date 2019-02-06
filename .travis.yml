@@ -1,0 +1,20 @@
+language: elixir
+matrix:
+  include:
+    - elixir: "1.6.6"
+      otp_release: "20.3"
+    - elixir: "1.7.2"
+      otp_release: "21.0"
+services:
+  - docker
+cache:
+  directories:
+    - deps
+    - _build
+before_script:
+  - docker-compose pull
+  - docker-compose up
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - MIX_ENV=test mix compile --warnings-as-errors
+  - MIX_ENV=test mix test
