@@ -13,7 +13,7 @@ cache:
     - _build
 before_script:
   - docker-compose pull
-  - docker-compose up
+  - docker-compose up -d
 script:
   - cd $TRAVIS_BUILD_DIR
   - MIX_ENV=test mix compile --warnings-as-errors
