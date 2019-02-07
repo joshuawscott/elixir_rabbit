@@ -78,7 +78,7 @@ defmodule ElixirRabbitTest do
     AMQP.Exchange.declare(t.channel, exchange_name, :topic, durable: false)
     AMQP.Queue.declare(t.channel, queue_name)
     AMQP.Queue.bind(t.channel, queue_name, exchange_name)
-    {:ok, reader} = Reader.start_link([t.channel, queue_name, t.filename])
+    {:ok, reader} = Reader.start_link({t.channel, queue_name, t.filename})
 
     messages =
       for n <- 1..1000 do

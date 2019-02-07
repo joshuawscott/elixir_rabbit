@@ -22,7 +22,9 @@ defmodule ElixirRabbit.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:amqp, "~> 1.1"}
+      {:amqp, "~> 1.1"},
+      {:credo, "~> 1.0", only: :dev},
+      {:dialyxir, "~> 1.0.0-rc.4", only: :dev}
     ]
   end
 end

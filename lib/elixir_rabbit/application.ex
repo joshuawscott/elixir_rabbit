@@ -1,4 +1,6 @@
 defmodule ElixirRabbit.Application do
+  @moduledoc "Application startup module"
+
   use Application
 
   alias ElixirRabbit.Reader
@@ -8,7 +10,7 @@ defmodule ElixirRabbit.Application do
       with {:ok, queue_options} <- fetch_env(:queue),
            {:ok, exchange_options} <- fetch_env(:exchange),
            {:ok, amqp_uris} <- fetch_env(:amqp_uris),
-           {:ok, {queue_name, queue_options}} <-
+           {:ok, {queue_name, _queue_options}} <-
              pop_fetch(queue_options, :name, "Missing Queue Name"),
            {:ok, {exchange_name, exchange_options}} <-
              pop_fetch(exchange_options, :name, "Missing Exchange Name"),
@@ -29,7 +31,7 @@ defmodule ElixirRabbit.Application do
     {:ok, filename} = fetch_env(:output_file)
 
     children = [
-      {Reader, [channel, queue_name, filename]}
+      {Reader, {channel, queue_name, filename}}
     ]
 
     options = [strategy: :one_for_one]
@@ -38,7 +40,7 @@ defmodule ElixirRabbit.Application do
   end
 
   def stop(connection) do
-    AMQP.close(connection)
+    AMQP.Connection.close(connection)
   end
 
   defp fetch_env(key) do

@@ -1,17 +1,23 @@
 defmodule ElixirRabbit.Reader do
+  @moduledoc """
+  Reads a RabbitMQ queue and writes the messages to a file, one line per message.
+  """
   use GenServer
   require Logger
 
-  def start_link([channel, queue, filename]) do
-    GenServer.start_link(__MODULE__, [channel, queue, filename])
+  @spec start_link({AMQP.Channel.t(), String.t(), String.t()}) :: GenServer.on_start()
+  def start_link({channel, queue, filename}) do
+    GenServer.start_link(__MODULE__, {channel, queue, filename})
   end
 
-  def init([channel, queue, filename]) do
+  @impl true
+  def init({channel, queue, filename}) do
     delete_file!(filename)
     {:ok, file} = File.open(filename, [:write])
     {:ok, %{file: file, channel: channel, queue: queue, consumer_tag: nil}, 0}
   end
 
+  @impl true
   def handle_info(:timeout, state) do
     {:ok, consumer_tag} = AMQP.Basic.consume(state.channel, state.queue)
     {:noreply, %{state | consumer_tag: consumer_tag}}
@@ -43,7 +49,8 @@ defmodule ElixirRabbit.Reader do
     {:noreply, state}
   end
 
-  def terminate(reason, state) do
+  @impl true
+  def terminate(_reason, state) do
     AMQP.Channel.close(state.channel)
   end
 
