@@ -1,18 +1,21 @@
 defmodule ElixirRabbit do
-  @moduledoc """
-  Documentation for ElixirRabbit.
-  """
+  @moduledoc false
 
-  @doc """
-  Hello world.
+  def connect_with_retry(uri, retries) do
+    do_connect_with_retry(uri, retries, 1)
+  end
 
-  ## Examples
+  def do_connect_with_retry(_, max_retries, retry_number) when retry_number > max_retries do
+    {:error, {:max_retries_reached, max_retries}}
+  end
 
-      iex> ElixirRabbit.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def do_connect_with_retry(uri, max_retries, retry_number) do
+    case AMQP.Connection.open(uri) do
+      {:ok, connection} ->
+        {:ok, connection}
+      {:error, _} ->
+        :timer.sleep(retry_number * retry_number * 1000)
+        do_connect_with_retry(uri, max_retries, retry_number + 1)
+    end
   end
 end

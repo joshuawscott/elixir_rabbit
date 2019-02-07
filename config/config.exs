@@ -28,3 +28,13 @@ use Mix.Config
 # here (which is why it is important to import them last).
 #
 #     import_config "#{Mix.env}.exs"
+config :elixir_rabbit,
+  amqp_uris: ["amqp://localhost:5672/"],
+  exchange: [
+    name: "my_exchange"
+  ],
+  queue: [
+    name: "my_queue"
+  ]
+
+import_config "#{Mix.env()}.exs"
