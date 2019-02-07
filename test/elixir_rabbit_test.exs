@@ -76,7 +76,7 @@ defmodule ElixirRabbitTest do
     queue_name = "my_other_queue"
     exchange_name = "my_other_exchange"
     AMQP.Exchange.declare(t.channel, exchange_name, :topic, durable: false)
-    AMQP.Queue.declare(t.channel, queue_name)
+    AMQP.Queue.declare(t.channel, queue_name, auto_delete: true)
     AMQP.Queue.bind(t.channel, queue_name, exchange_name)
     {:ok, reader} = Reader.start_link({t.channel, queue_name, t.filename})
 

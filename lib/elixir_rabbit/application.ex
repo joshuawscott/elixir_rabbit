@@ -10,16 +10,16 @@ defmodule ElixirRabbit.Application do
       with {:ok, queue_options} <- fetch_env(:queue),
            {:ok, exchange_options} <- fetch_env(:exchange),
            {:ok, amqp_uris} <- fetch_env(:amqp_uris),
-           {:ok, {queue_name, _queue_options}} <-
+           {:ok, {queue_name, queue_options}} <-
              pop_fetch(queue_options, :name, "Missing Queue Name"),
            {:ok, {exchange_name, exchange_options}} <-
              pop_fetch(exchange_options, :name, "Missing Exchange Name"),
            {exchange_type, exchange_options} when exchange_type != nil <-
              Keyword.pop(exchange_options, :type, :direct),
-           {:ok, connection} <- AMQP.Connection.open(Enum.random(amqp_uris)),
+           {:ok, connection} <- ElixirRabbit.connect_with_retry(Enum.random(amqp_uris), 5),
            {:ok, channel} <- AMQP.Channel.open(connection),
            :ok <- AMQP.Exchange.declare(channel, exchange_name, exchange_type, exchange_options),
-           {:ok, _} <- AMQP.Queue.declare(channel, queue_name) do
+           {:ok, _} <- AMQP.Queue.declare(channel, queue_name, queue_options) do
         bind_options = Application.get_env(:elixir_rabbit, :bind_options)
         AMQP.Queue.bind(channel, queue_name, exchange_name, bind_options)
         {connection, channel, queue_name}
